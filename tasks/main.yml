@@ -1,0 +1,8 @@
+---
+# Импортируем задание развертывания
+- name: CNI | Importing an installation task
+  import_tasks: "installing_cni_plugins.yml"
+
+# Импортируем задание конфигурирования
+- name: CNI | Importing a configuration task
+  import_tasks: "configuring_cni.yml"

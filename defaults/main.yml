@@ -1,0 +1,83 @@
+---
+# Вкл/Выкл использование downloader сервера (актуально если на удаленном хосте нет доступа к сети интернет или же количество хостов на которые необходимо доставить архив больше 1го)
+use_downloader: true
+# Машина через которую осуществляется выкачивание архива из сети интернет
+downloader: localhost
+# При использовании downloader в данную папку будет осуществлятся скачивание архива, в дальнейшем распространение архива на удаленные хосты осуществляется из данной папки downloader сервера.
+downloader_source_folder: ~/DISTR
+# Папка в которую будет осуществлена загрузка установочного архива
+distribution_path: "/opt/DISTR"
+
+# Алгоритм проверки контрольной суммы архива
+checksum_algorithm: "sha256"
+
+# Папка для конфигурационных файлов
+cni_plugins_config_dir: /etc/cni/net.d
+# Папка для установки плагинов
+cni_plugins_bin_dir: /opt/cni/bin
+
+# Устаноавливаемая версия
+cni_plugins_version: v0.8.3
+# Имена устанавливаемых компонентов
+cni_plugins_bin_name:
+  - bandwidth
+  - bridge
+  - dhcp
+  - firewall
+  - flannel
+  - host-device
+  - host-local
+  - ipvlan
+  - loopback
+  - macvlan
+  - portmap
+  - ptp
+  - sbr
+  - static
+  - tuning
+  - vlan
+
+cni_plugins:
+  v0.8.3:
+    source_url: https://github.com/containernetworking/plugins/releases/download/v0.8.3/cni-plugins-linux-amd64-v0.8.3.tgz
+    # Контрольная сумма скачаемого архива и бинарников
+    archive_checksum: 29a092bef9cb6f26c8d5340f3d56567b62c7ebdb1321245d94b1842c80ba20ba
+    # Параметр распаковки архива на удаленном сервере
+    extra_opts:
+      --strip-components=1
+    # Контрольная суммы бинарных файлов
+    bandwidth:
+      binary_checksum: e9f60002a0804f3eae9903271bad2832c0bb166aa23ab46bd6bb35f0840e41e5
+    bridge:
+      binary_checksum: b9a8e06f4f4d9dadc9366aa503eae9aed5c95038173bc67b8ddc3f972921ead3
+    dhcp:
+      binary_checksum: f82182baa98bdb9fde943bfb64b29ff9ad2452e6d27edcd05a029e00caafa7f2
+    firewall:
+      binary_checksum: 7e796369da6049e5dc8bdeeaf99a64f63bfb0c062855773c373772d65370a45e
+    flannel:
+      binary_checksum: c0c3b97558c53858d692e9a3bf1744ec0b8edd1a30f4eaa7872f7ef8f44fe83d
+    host-device:
+      binary_checksum: 6d35765e6a50f6f33c8898c6845161d3c172b731786d3ef8a6185467fcae1170
+    host-local:
+      binary_checksum: 8960ec6b8410cf1c877a35664c844319d178fed1c2457d3a282e7b80654ced25
+    ipvlan:
+      binary_checksum: 3ed612400bee295ff15fd20860ceb52172bc8a28c70f6e729d2aa61470d903b5
+    loopback:
+      binary_checksum: 1a070b708f2eef78ea404ebce3f001c82cba024565e3997daba71caa484b17ff
+    macvlan:
+      binary_checksum: 34d6e4b405c5e21cfef2b5c134154ea4bce4d90accac240818bfc9dc47da4cff
+    portmap:
+      binary_checksum: e7d20c02103e89d059eefe95a8e13e71291155f89a67a6e62ff4c7f48a6574cf
+    ptp:
+      binary_checksum: 31801ddef09594d3630d395ed3d778c123a09362ab6a8c84a1c065bcbb6a3cb0
+    sbr:
+      binary_checksum: 1e4ebb9b416e8b607c2a883c64725be9778a7e7311401c1c8330cbd17733eb77
+    static:
+      binary_checksum: b9b37abb6818f2a8851f98e46efeb141d43b56a8a38b21f7109bc77e8a60b013
+    tuning:
+      binary_checksum: 8604bbdd9fb243e43c96ab22af011ff37cdbf948994ccb30bef7509cc57da82c
+    vlan:
+      binary_checksum: 7f344a03fbf2890247dde22f1fd31d7613844b9d432c3c07954197d367107fb4
+
+kube_pod_network: 10.16.0.0/16
+# kube_network_plugin: ""

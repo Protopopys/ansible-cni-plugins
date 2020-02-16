@@ -1,0 +1,32 @@
+---
+# Создаем папку для конфигурационных файлов
+- name: CNI | Ensure folder for configuration files exists
+  file:
+    path: "{{ cni_plugins_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u+rwx
+
+# Создаем конфигурационный файл
+# Если
+## Переменная kube_network_plugin не найдена или пуста
+## kube_pod_network существует
+- name: CNI | Create the bridge network configuration file
+  template:
+    src: 10-bridge.conf.j2
+    dest: "{{ cni_plugins_config_dir }}/10-bridge.conf"
+  when:
+    - kube_network_plugin is not defined
+    - kube_pod_network is defined
+
+# Создаем конфигурационный файл
+# Если
+## Переменная kube_network_plugin не найдена или пуста
+- name: CNI | Create the loopback network configuration file
+  template:
+    src: 99-loopback.conf.j2
+    dest: "{{ cni_plugins_config_dir }}/99-loopback.conf"
+  when:
+    - kube_network_plugin is not defined
+    - kube_pod_network is defined

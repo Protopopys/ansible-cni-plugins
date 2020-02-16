@@ -1,0 +1,134 @@
+---
+# Проверяем наличие требуемых бинарников
+- name: CNI | Checking that the cni-plugins binaries exists
+  stat:
+    path: "{{ cni_plugins_bin_dir }}/{{ item }}"
+    checksum_algorithm: "{{ checksum_algorithm }}"
+  register: cni_plugins_bin
+  loop: "{{ cni_plugins_bin_name }}"
+
+# Создаем переменную install_cni_plugins=true
+# Если:
+## Контрольная сумма бинарных файлов не соответствует требуемой
+- name: CNI | Set 'install_cni_plugins' to true
+  set_fact:
+    install_cni_plugins: true
+  loop: "{{ cni_plugins_bin.results }}"
+  when: item.stat.checksum|default() != cni_plugins[cni_plugins_version][item.item].binary_checksum
+
+- name: CNI |(when install_cni_plugins == TRUE)
+  block:
+    # Создаем папку на удаленной машине (в данную папку будет осуществляться скачивание архива) 
+    - name: CNI | Creating folder
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: u+rwx
+      loop:
+        - "{{ distribution_path }}"
+        - "{{ cni_plugins_bin_dir }}"
+
+    # Проверяем наличие требуемого архива
+    - name: CNI | Checking that the cni-plugins archive exists
+      stat:
+        path: "{{ distribution_path }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
+        checksum_algorithm: "{{ checksum_algorithm }}"
+      register: cni_plugins_archive
+  when: install_cni_plugins|default(false)
+
+# Блок заданий
+# Исполняется если:
+## Переменная install_cni_plugins=true и
+## Использвание downloader сервера включено - use_downloader=true и 
+## Контрольная сумма архива не совпадает с указанной в переменной - cni_plugins[cni_plugins_version].archive_checksum
+- name: CNI |(when use_downloader == TRUE)
+  block:
+  # Создаем папку на downloader сервере (в данную папку будет осуществляться скачивание архива из сети интернет)
+  - name: CNI | Creating default folder for components
+    file:
+      path: "{{ downloader_source_folder }}"
+      state: directory
+      mode: u+rwx
+    run_once: true
+    delegate_to: "{{ downloader }}"
+
+  # Проверяем наличие архива на downloader сервере
+  - name: CNI | Check that the cni-plugins archive exists on the {{ downloader }}
+    stat:
+      path: "{{ downloader_source_folder }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
+      checksum_algorithm: "{{ checksum_algorithm }}"
+    register: downloader_component
+    delegate_to: "{{ downloader }}"
+
+  # Выкачиваем архив напрямую из сети интернет
+  # Если:
+  ## Если архива нет на downloader сервере или Контрольная сумма архива не совпадает с указанной в переменной - cni_plugins[cni_plugins_version].archive_checksum)
+  - name: CNI | Download cni-plugins archive to {{ downloader }}
+    get_url:
+      url: "{{ cni_plugins[cni_plugins_version].source_url }}"
+      dest: "{{ downloader_source_folder }}"
+      checksum: "{{ checksum_algorithm }}:{{ cni_plugins[cni_plugins_version].archive_checksum }}"
+    run_once: true
+    delegate_to: "{{ downloader }}"
+    when:
+      - not downloader_component.stat.exists or
+        downloader_component.stat.checksum|default() != cni_plugins[cni_plugins_version].archive_checksum
+
+  # Выполняем синхронизацию архива с удаленной машиной
+  # Если:
+  ## downloader сервером не является localhost (не та машина на которой осуществляется запуск playbook)
+  - name: CNI | Copy from {{ downloader }} to remote host
+    synchronize:
+      checksum: true
+      src: "{{ downloader_source_folder }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
+      dest: "{{ distribution_path }}"
+    delegate_to: "{{ downloader }}"
+    when: downloader != "localhost"
+
+  # Выполняем копирование архива на удаленную машину
+  # Если:
+  ## downloader сервером является localhost (машина на которой осуществляется запуск playbook)
+  - name: CNI | Copy from {{ downloader }} to remote host
+    copy:
+      src: "{{ downloader_source_folder }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
+      dest: "{{ distribution_path }}"
+      owner: root
+      group: root
+      mode: u+rwx
+    when: downloader == "localhost"
+  when:
+    - install_cni_plugins|default(false)
+    - use_downloader
+    - cni_plugins_archive.stat.checksum|default() != cni_plugins[cni_plugins_version].archive_checksum
+
+# Выкачиваем архив напрямую из сети интернет
+# Если:
+## Переменная install_cni_plugins=true и
+## Использвание downloader сервера отключено: use_downloader=false и 
+## Контрольная сумма архива не совпадает с указанной в переменной - cni_plugins[cni_plugins_version].archive_checksum)
+- name: CNI | Download cni-plugins archive to host
+  get_url:
+    url: "{{ cni_plugins[cni_plugins_version].source_url }}"
+    dest: "{{ distribution_path }}"
+    checksum: "{{ checksum_algorithm }}:{{ cni_plugins[cni_plugins_version].archive_checksum }}"
+    owner: root
+    group: root
+  when:
+    - install_cni_plugins|default(false)
+    - not use_downloader
+    - cni_plugins_archive.stat.checksum|default() != cni_plugins[cni_plugins_version].archive_checksum
+
+# Распаковываем архив на удаленном сервере
+# Если:
+## Переменная install_cni_plugins=true
+- name: CNI | Extract cni-plugins archive into {{ distribution_path }}
+  unarchive:
+    src: "{{ distribution_path }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
+    dest: "{{ cni_plugins_bin_dir }}"
+    owner: root
+    group: root
+    remote_src: true
+    extra_opts: "{{ cni_plugins[cni_plugins_version].extra_opts }}"
+  when: install_cni_plugins|default(false)
