@@ -11,14 +11,14 @@
 # Создаем конфигурационный файл
 # Если
 ## Переменная kube_network_plugin не найдена или пуста
-## kube_pod_network существует
+## kube_pods_subnet существует
 - name: CNI | Create the bridge network configuration file
   template:
     src: 10-bridge.conf.j2
     dest: "{{ cni_plugins_config_dir }}/10-bridge.conf"
   when:
-    - kube_network_plugin is not defined
-    - kube_pod_network is defined
+    - "kube_network_plugin == 'cni'"
+    - kube_pods_subnet is defined
 
 # Создаем конфигурационный файл
 # Если
@@ -28,5 +28,5 @@
     src: 99-loopback.conf.j2
     dest: "{{ cni_plugins_config_dir }}/99-loopback.conf"
   when:
-    - kube_network_plugin is not defined
-    - kube_pod_network is defined
+    - "kube_network_plugin == 'cni'"
+    - kube_pods_subnet is defined

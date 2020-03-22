@@ -55,7 +55,7 @@
     delegate_to: localhost
 
   # Проверяем наличие архива на downloader сервере
-  - name: CNI | Check that the cni-plugins archive exists on the {{ downloader }}
+  - name: CNI | Check that the cni-plugins archive exists on the localhost
     stat:
       path: "{{ downloader_source_folder }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
       checksum_algorithm: "{{ checksum_algorithm }}"
@@ -65,7 +65,7 @@
   # Выкачиваем архив напрямую из сети интернет
   # Если:
   ## Если архива нет на downloader сервере или Контрольная сумма архива не совпадает с указанной в переменной - cni_plugins[cni_plugins_version].archive_checksum)
-  - name: CNI | Download cni-plugins archive to {{ downloader }}
+  - name: CNI | Download cni-plugins archive to localhost
     get_url:
       url: "{{ cni_plugins[cni_plugins_version].source_url }}"
       dest: "{{ downloader_source_folder }}"
@@ -79,7 +79,7 @@
   # Выполняем копирование архива на удаленную машину
   # Если:
   ## downloader сервером является localhost (машина на которой осуществляется запуск playbook)
-  - name: CNI | Copy from {{ downloader }} to remote host
+  - name: CNI | Copy from localhost to remote host
     copy:
       src: "{{ downloader_source_folder }}/{{ cni_plugins[cni_plugins_version].source_url | basename }}"
       dest: "{{ distribution_path }}"

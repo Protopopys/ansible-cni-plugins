@@ -16,6 +16,14 @@ cni_plugins_bin_dir: /opt/cni/bin
 
 # Устаноавливаемая версия
 cni_plugins_version: v0.8.3
+
+# internal network. When used, it will assign IP
+# addresses from this range to individual pods.
+# This network must be unused in your network infrastructure!
+kube_pods_subnet: 10.233.64.0/18
+
+kube_network_plugin: "cni"
+
 # Имена устанавливаемых компонентов
 cni_plugins_bin_name:
   - bandwidth
@@ -76,6 +84,3 @@ cni_plugins:
       binary_checksum: 8604bbdd9fb243e43c96ab22af011ff37cdbf948994ccb30bef7509cc57da82c
     vlan:
       binary_checksum: 7f344a03fbf2890247dde22f1fd31d7613844b9d432c3c07954197d367107fb4
-
-kube_pod_network: 10.16.0.0/16
-# kube_network_plugin: ""

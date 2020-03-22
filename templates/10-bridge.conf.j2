@@ -8,7 +8,7 @@
     "ipam": {
         "type": "host-local",
         "ranges": [
-          [{"subnet": "{{ kube_pod_network }}"}]
+          [{"subnet": "{{ kube_pods_subnet }}"}]
         ],
         "routes": [{"dst": "0.0.0.0/0"}]
     }
