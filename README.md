@@ -1,3 +1,5 @@
+![Molecule Test](https://github.com/Protopopys/ansible-cni-plugins/workflows/Molecule%20Test/badge.svg)
+
 Role Name
 =========
 

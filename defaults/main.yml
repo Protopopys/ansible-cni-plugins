@@ -15,7 +15,7 @@ cni_plugins_config_dir: /etc/cni/net.d
 cni_plugins_bin_dir: /opt/cni/bin
 
 # Устаноавливаемая версия
-cni_plugins_version: v0.8.3
+cni_plugins_version: v0.8.5
 
 # internal network. When used, it will assign IP
 # addresses from this range to individual pods.
@@ -84,3 +84,43 @@ cni_plugins:
       binary_checksum: 8604bbdd9fb243e43c96ab22af011ff37cdbf948994ccb30bef7509cc57da82c
     vlan:
       binary_checksum: 7f344a03fbf2890247dde22f1fd31d7613844b9d432c3c07954197d367107fb4
+  v0.8.5:
+    source_url: https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz
+    # Контрольная сумма скачаемого архива и бинарников
+    archive_checksum: bd682ffcf701e8f83283cdff7281aad0c83b02a56084d6e601216210732833f9
+    # Параметр распаковки архива на удаленном сервере
+    extra_opts:
+      --strip-components=1
+    # Контрольная суммы бинарных файлов
+    bandwidth:
+      binary_checksum: e76014adc0c1a0b9303c89f9d6a0c762a70939d5362cb656a62f7605cfb1524c
+    bridge:
+      binary_checksum: 2af6324e68ad38240d49dec6f3fecef8ed837d04431344765c8ca7b48f981ba6
+    dhcp:
+      binary_checksum: be9f971be00de8aa1448dd0bd57c63e11ed21c944e43113e189561eb9b4b295d
+    firewall:
+      binary_checksum: e67b6df0d4036cea9461ae4527e01045f63a6f947abec4b5cf9cb53ff310ee56
+    flannel:
+      binary_checksum: 7dd433fe958a03eb023a116572afdd28e3ed12a176afc31824d432575d2bd4e7
+    host-device:
+      binary_checksum: 81cfb4ec6fba109b1516b79d3ee401f0862471e3d79aadfe136eff4c12003c64
+    host-local:
+      binary_checksum: 9abe49d2692dca3c654d1f0f6cf03bd4d86534129cd2d88d00d6c9a5f8ab682d
+    ipvlan:
+      binary_checksum: a1a70e0f124a5b5e10e50cdc3812a5ab99a17f3dd5434c91369ff81a0d31229b
+    loopback:
+      binary_checksum: f5c509cea9dc6a021ac4cb22ecb8e9f6316ab6b923290d6069935dd2e4fdb962
+    macvlan:
+      binary_checksum: f2a7b17b3c541a3372a22fc058707e6276ddfe23567a1f7215b9386ac0ee2759
+    portmap:
+      binary_checksum: 66e60cec009986ba2ff56ea170c6f8d567ee7dab0e807da5c973bff27b63e4b8
+    ptp:
+      binary_checksum: 471aac800c4b7be46539a51805fed3c0b7666b731d83ac821d04c504522e13ae
+    sbr:
+      binary_checksum: 030ef732d40105cda8f4c07ad16a86f053a3d4f0ebbefbfe4268a2553e013bb1
+    static:
+      binary_checksum: b6182ece2481b4cbafa6f44bec6cb62fbd8d4558f5be43fc299a5213ff99e252
+    tuning:
+      binary_checksum: b738f27c972ff70adbe0e61f02ba29ecefb813bb2b227612d0a8a43f6be4b4e4
+    vlan:
+      binary_checksum: cd796ab1cdec4c90b521cf6439f68ab0885f9da539583e8ccddeaff0caa3d0cb
